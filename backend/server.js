@@ -5,9 +5,10 @@ const fs = require('fs');
 const { exec } = require('child_process');
 const { v4: uuidv4 } = require('uuid');
 const cors = require('cors');
+const path = require('path');
 
 const app = express();
-const PORT = 3001;
+const PORT = process.env.PORT || 3001;
 
 // Temp directories
 const UPLOAD_DIR = path.join(__dirname, 'temp', 'uploads');
@@ -17,7 +18,7 @@ const OUTPUT_DIR = path.join(__dirname, 'temp', 'outputs');
   if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
 });
 
-app.use(cors({ origin: 'http://localhost:3000' }));
+app.use(cors());
 app.use(express.json());
 
 // Multer config
@@ -53,6 +54,7 @@ function deleteFile(filePath) {
 }
 
 // POST /upload
+app.use(express.static(path.join(__dirname, '..', 'frontend')));
 app.post('/upload', (req, res) => {
   upload.single('video')(req, res, (uploadErr) => {
     if (uploadErr) {
@@ -108,10 +110,16 @@ app.post('/upload', (req, res) => {
     });
   });
 });
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '..', 'frontend', 'index.html'));
+});
 
 // Health check
 app.get('/health', (req, res) => res.json({ status: 'ok' }));
 
-app.listen(PORT, '127.0.0.1', () => {
-  console.log(`✅ Backend running at http://localhost:${PORT}`);
+app.listen(PORT, '0.0.0.0', () => {   // 0.0.0.0 not 127.0.0.1
+  console.log(`Server running on port ${PORT}`);
+});
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '..', 'frontend', 'index.html'));
 });
