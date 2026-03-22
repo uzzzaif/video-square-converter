@@ -3,419 +3,189 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>SQUARECUT — Video to 1080×1080</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Barlow+Condensed:wght@400;600;800&display=swap" rel="stylesheet" />
+  <title>SpiderCut — by uzzzaif</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
   <style>
-    :root {
-      --bg:        #0d0d0d;
-      --surface:   #161616;
-      --border:    #2a2a2a;
-      --accent:    #e8ff47;
-      --accent2:   #ff6b35;
-      --text:      #e8e8e8;
-      --muted:     #666;
-      --danger:    #ff4040;
-      --success:   #47ff8e;
-      --mono:      'IBM Plex Mono', monospace;
-      --display:   'Barlow Condensed', sans-serif;
-    }
-
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
-      background: var(--bg);
-      color: var(--text);
-      font-family: var(--mono);
+      background: #0e0e0e;
+      color: #e8e8e8;
+      font-family: 'Inter', sans-serif;
       min-height: 100vh;
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 40px 20px 60px;
-      overflow-x: hidden;
+      justify-content: center;
+      padding: 40px 20px;
     }
 
-    /* Background grid */
-    body::before {
-      content: '';
-      position: fixed;
-      inset: 0;
-      background-image:
-        linear-gradient(rgba(232,255,71,0.03) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(232,255,71,0.03) 1px, transparent 1px);
-      background-size: 40px 40px;
-      pointer-events: none;
-      z-index: 0;
-    }
-
-    .wrapper {
-      position: relative;
-      z-index: 1;
+    .card {
       width: 100%;
-      max-width: 680px;
+      max-width: 480px;
+      background: #161616;
+      border: 1px solid #242424;
+      border-radius: 12px;
+      padding: 32px;
     }
 
-    /* Header */
-    header {
-      margin-bottom: 48px;
-      border-bottom: 1px solid var(--border);
-      padding-bottom: 24px;
-    }
+    .header { margin-bottom: 28px; }
 
     .logo {
-      font-family: var(--display);
-      font-weight: 800;
-      font-size: clamp(52px, 10vw, 88px);
-      letter-spacing: -2px;
-      line-height: 0.9;
-      color: var(--accent);
-      text-transform: uppercase;
-    }
-
-    .logo span {
-      color: var(--text);
-      opacity: 0.25;
-    }
-
-    .tagline {
-      margin-top: 12px;
-      font-size: 11px;
-      color: var(--muted);
-      letter-spacing: 0.15em;
-      text-transform: uppercase;
-    }
-
-    .spec-badge {
-      display: inline-block;
-      background: var(--accent);
-      color: #000;
-      font-size: 10px;
+      font-size: 22px;
       font-weight: 600;
-      letter-spacing: 0.1em;
-      padding: 3px 8px;
-      margin-top: 10px;
+      letter-spacing: -0.3px;
+    }
+    .logo .spider { color: #e8001c; }
+
+    .sub {
+      margin-top: 4px;
+      font-size: 13px;
+      color: #555;
     }
 
-    /* Drop zone */
     #drop-zone {
-      border: 1px solid var(--border);
-      background: var(--surface);
-      padding: 48px 32px;
+      border: 1.5px dashed #2e2e2e;
+      border-radius: 8px;
+      padding: 36px 20px;
       text-align: center;
       cursor: pointer;
-      position: relative;
       transition: border-color 0.15s, background 0.15s;
       user-select: none;
     }
-
-    #drop-zone:hover,
-    #drop-zone.dragover {
-      border-color: var(--accent);
-      background: rgba(232,255,71,0.04);
+    #drop-zone:hover, #drop-zone.dragover {
+      border-color: #e8001c;
+      background: rgba(232,0,28,0.04);
     }
 
-    #drop-zone.dragover::after {
-      content: 'DROP IT';
-      position: absolute;
-      inset: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-family: var(--display);
-      font-size: 64px;
-      font-weight: 800;
-      color: var(--accent);
-      background: rgba(13,13,13,0.85);
-      letter-spacing: 4px;
-    }
+    .drop-icon { font-size: 28px; margin-bottom: 10px; opacity: 0.6; }
+    .drop-title { font-size: 14px; font-weight: 500; color: #ccc; margin-bottom: 4px; }
+    .drop-hint  { font-size: 12px; color: #444; }
 
-    .drop-icon {
-      width: 48px;
-      height: 48px;
-      margin: 0 auto 16px;
-      border: 1px solid var(--border);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: var(--muted);
-    }
-
-    .drop-icon svg { width: 22px; height: 22px; }
-
-    .drop-label {
-      font-size: 13px;
-      color: var(--muted);
-      line-height: 1.6;
-    }
-
-    .drop-label strong {
-      display: block;
-      font-size: 15px;
-      color: var(--text);
-      margin-bottom: 6px;
-    }
-
-    .drop-types {
-      font-size: 10px;
-      color: var(--muted);
-      margin-top: 10px;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-    }
-
-    /* File info bar */
     #file-info {
       display: none;
-      margin-top: 12px;
-      padding: 12px 16px;
-      background: var(--surface);
-      border: 1px solid var(--border);
+      margin-top: 10px;
+      padding: 10px 14px;
+      background: #1e1e1e;
+      border-radius: 6px;
       align-items: center;
-      gap: 12px;
-    }
-
-    #file-info.visible { display: flex; }
-
-    .file-dot {
-      width: 8px;
-      height: 8px;
-      background: var(--accent);
-      flex-shrink: 0;
-    }
-
-    #file-name {
-      font-size: 12px;
-      color: var(--text);
-      flex: 1;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-
-    #file-size {
-      font-size: 11px;
-      color: var(--muted);
-      flex-shrink: 0;
-    }
-
-    #clear-btn {
-      background: none;
-      border: none;
-      color: var(--muted);
-      cursor: pointer;
-      font-size: 16px;
-      line-height: 1;
-      padding: 0;
-      flex-shrink: 0;
-      transition: color 0.1s;
-    }
-    #clear-btn:hover { color: var(--danger); }
-
-    /* Controls row */
-    .controls {
-      margin-top: 20px;
-      display: flex;
       gap: 10px;
     }
+    #file-info.visible { display: flex; }
 
-    /* Buttons */
+    #file-name {
+      font-size: 13px; color: #ccc; flex: 1;
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+    #file-size { font-size: 12px; color: #555; flex-shrink: 0; }
+    #clear-btn {
+      background: none; border: none; color: #444;
+      cursor: pointer; font-size: 16px; line-height: 1;
+      padding: 0; flex-shrink: 0; transition: color 0.1s;
+    }
+    #clear-btn:hover { color: #e8001c; }
+
+    .controls { margin-top: 14px; display: flex; gap: 8px; }
+
     button {
-      font-family: var(--mono);
-      cursor: pointer;
-      border: none;
-      font-size: 12px;
-      font-weight: 600;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
+      font-family: 'Inter', sans-serif;
+      font-size: 13px; font-weight: 500;
+      cursor: pointer; border: none; border-radius: 6px; outline: none;
       transition: all 0.12s;
-      outline: none;
     }
 
     #browse-btn {
-      flex: 0 0 auto;
-      padding: 14px 20px;
-      background: var(--surface);
-      color: var(--muted);
-      border: 1px solid var(--border);
+      padding: 10px 16px;
+      background: #222; color: #888;
+      border: 1px solid #2e2e2e;
     }
-    #browse-btn:hover {
-      border-color: var(--text);
-      color: var(--text);
-    }
+    #browse-btn:hover { color: #ccc; border-color: #444; }
 
     #convert-btn {
-      flex: 1;
-      padding: 14px 24px;
-      background: var(--accent);
-      color: #000;
+      flex: 1; padding: 10px;
+      background: #e8001c; color: #fff;
     }
-    #convert-btn:hover:not(:disabled) {
-      background: #fff;
-    }
-    #convert-btn:disabled {
-      background: var(--border);
-      color: var(--muted);
-      cursor: not-allowed;
-    }
+    #convert-btn:hover:not(:disabled) { background: #c4001a; }
+    #convert-btn:disabled { background: #222; color: #444; cursor: not-allowed; }
 
-    /* Progress / Status */
     #status-box {
       display: none;
-      margin-top: 20px;
-      padding: 16px 20px;
-      border: 1px solid var(--border);
-      background: var(--surface);
+      margin-top: 14px; padding: 12px 14px;
+      border-radius: 6px; border: 1px solid #2e2e2e; background: #1a1a1a;
     }
-
     #status-box.visible { display: block; }
-    #status-box.error { border-color: var(--danger); }
-    #status-box.success { border-color: var(--success); }
+    #status-box.error   { border-color: #e8001c; background: #1a0808; }
+    #status-box.success { border-color: #1d7a3a; background: #0a1a10; }
 
-    .status-header {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 8px;
-    }
-
-    .status-label {
-      font-size: 10px;
-      letter-spacing: 0.15em;
-      text-transform: uppercase;
-      font-weight: 600;
-    }
-
-    .status-label.processing { color: var(--accent); }
-    .status-label.error { color: var(--danger); }
-    .status-label.success { color: var(--success); }
+    .status-row { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
 
     .spinner {
-      width: 14px;
-      height: 14px;
-      border: 2px solid var(--border);
-      border-top-color: var(--accent);
-      border-radius: 50%;
-      animation: spin 0.7s linear infinite;
-      flex-shrink: 0;
+      width: 13px; height: 13px;
+      border: 2px solid #333; border-top-color: #e8001c;
+      border-radius: 50%; animation: spin 0.7s linear infinite; flex-shrink: 0;
     }
-
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    #status-msg {
-      font-size: 12px;
-      color: var(--muted);
-      line-height: 1.5;
+    .status-label {
+      font-size: 12px; font-weight: 600;
+      text-transform: uppercase; letter-spacing: 0.08em;
     }
+    .status-label.processing { color: #e8001c; }
+    .status-label.error      { color: #e8001c; }
+    .status-label.success    { color: #3dba65; }
 
-    /* Progress bar */
+    #status-msg { font-size: 12px; color: #555; line-height: 1.5; white-space: pre-wrap; }
+
     #progress-bar-wrap {
-      margin-top: 12px;
-      height: 2px;
-      background: var(--border);
-      overflow: hidden;
-      display: none;
+      display: none; margin-top: 8px;
+      height: 2px; background: #2a2a2a; border-radius: 2px; overflow: hidden;
     }
-
     #progress-bar-wrap.visible { display: block; }
-
     #progress-bar {
-      height: 100%;
-      background: var(--accent);
-      width: 0%;
-      transition: width 0.3s;
-      animation: indeterminate 1.5s ease-in-out infinite;
+      height: 100%; background: #e8001c; width: 40%;
+      animation: slide 1.2s ease-in-out infinite;
+    }
+    @keyframes slide {
+      0%   { transform: translateX(-150%); }
+      100% { transform: translateX(350%); }
     }
 
-    @keyframes indeterminate {
-      0%   { transform: translateX(-100%); width: 60%; }
-      100% { transform: translateX(200%);  width: 60%; }
-    }
-
-    /* Download button */
     #download-btn {
-      display: none;
-      margin-top: 12px;
-      width: 100%;
-      padding: 14px;
-      background: var(--success);
-      color: #000;
-      font-size: 12px;
-      letter-spacing: 0.12em;
+      display: none; margin-top: 10px; width: 100%; padding: 10px;
+      background: #1d7a3a; color: #fff; border-radius: 6px;
+      font-size: 13px; font-weight: 500;
     }
-    #download-btn:hover { background: #fff; }
+    #download-btn:hover { background: #175e2d; }
     #download-btn.visible { display: block; }
 
-    /* Command display */
-    .cmd-block {
-      margin-top: 32px;
-      padding: 16px;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-left: 3px solid var(--accent);
+    .footer {
+      margin-top: 24px; font-size: 11px; color: #333;
+      display: flex; justify-content: space-between; align-items: center;
     }
+    .footer .by { color: #e8001c; opacity: 0.7; }
 
-    .cmd-label {
-      font-size: 9px;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      color: var(--muted);
-      margin-bottom: 8px;
-    }
-
-    .cmd-text {
-      font-size: 11px;
-      color: var(--accent);
-      line-height: 1.7;
-      word-break: break-all;
-    }
-
-    .cmd-text em {
-      font-style: normal;
-      color: var(--accent2);
-    }
-
-    /* Footer */
-    footer {
-      margin-top: 48px;
-      font-size: 10px;
-      color: var(--muted);
-      letter-spacing: 0.1em;
-      text-align: center;
-      text-transform: uppercase;
-    }
-
-    /* Hidden input */
     #file-input { display: none; }
   </style>
 </head>
 <body>
-  <div class="wrapper">
-    <header>
-      <div class="logo">Square<span>cut</span></div>
-      <div class="tagline">Distort. Compress. Square.</div>
-      <div class="spec-badge">1080 × 1080 · libx264 · CRF 23</div>
-    </header>
+  <div class="card">
+    <div class="header">
+      <div class="logo"><span class="spider">Spider</span>Cut</div>
+      <div class="sub">Convert video to 1080×1080 square</div>
+    </div>
 
     <input type="file" id="file-input" accept=".mp4,.mov,.mkv" />
 
     <div id="drop-zone">
-      <div class="drop-icon">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-          <path d="M15 10l-4 4-4-4M11 14V3M20 17v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-      </div>
-      <div class="drop-label">
-        <strong>Drag & drop your video here</strong>
-        or click the button below to browse
-      </div>
-      <div class="drop-types">MP4 · MOV · MKV · max 100 MB</div>
+      <div class="drop-icon">🕷</div>
+      <div class="drop-title">Drop your video here</div>
+      <div class="drop-hint">MP4 · MOV · MKV · max 100 MB</div>
     </div>
 
     <div id="file-info">
-      <div class="file-dot"></div>
       <span id="file-name">—</span>
       <span id="file-size"></span>
-      <button id="clear-btn" title="Remove file">×</button>
+      <button id="clear-btn">×</button>
     </div>
 
     <div class="controls">
@@ -424,187 +194,111 @@
     </div>
 
     <div id="status-box">
-      <div class="status-header">
+      <div class="status-row">
         <div class="spinner" id="spinner"></div>
         <span class="status-label" id="status-label-text">Processing</span>
       </div>
-      <div id="status-msg">Preparing upload...</div>
+      <div id="status-msg"></div>
       <div id="progress-bar-wrap"><div id="progress-bar"></div></div>
     </div>
 
-    <button id="download-btn">⬇ Download square_output.mp4</button>
+    <button id="download-btn">↓ Download square_output.mp4</button>
 
-    <div class="cmd-block">
-      <div class="cmd-label">FFmpeg Command</div>
-      <div class="cmd-text">
-        ffmpeg -i <em>[input]</em>
-        -vf scale=1080:1080
-        -aspect 1:1
-        -c:v libx264
-        -crf 23
-        -preset fast
-        -c:a copy
-        <em>[output]</em>
-      </div>
+    <div class="footer">
+      <span class="by">by uzzzaif</span>
+      <span>1080×1080 · libx264 · crf 23</span>
     </div>
-
-    <footer>Runs locally · localhost:3001 · Files deleted after conversion</footer>
   </div>
 
   <script>
-    const API = ''; 
+    const API = '';
+    const dropZone    = document.getElementById('drop-zone');
+    const fileInput   = document.getElementById('file-input');
+    const fileInfo    = document.getElementById('file-info');
+    const fileName    = document.getElementById('file-name');
+    const fileSize    = document.getElementById('file-size');
+    const clearBtn    = document.getElementById('clear-btn');
+    const browseBtn   = document.getElementById('browse-btn');
+    const convertBtn  = document.getElementById('convert-btn');
+    const statusBox   = document.getElementById('status-box');
+    const statusLabel = document.getElementById('status-label-text');
+    const statusMsg   = document.getElementById('status-msg');
+    const progressWrap= document.getElementById('progress-bar-wrap');
+    const spinner     = document.getElementById('spinner');
+    const downloadBtn = document.getElementById('download-btn');
 
-    const dropZone     = document.getElementById('drop-zone');
-    const fileInput    = document.getElementById('file-input');
-    const fileInfo     = document.getElementById('file-info');
-    const fileName     = document.getElementById('file-name');
-    const fileSize     = document.getElementById('file-size');
-    const clearBtn     = document.getElementById('clear-btn');
-    const browseBtn    = document.getElementById('browse-btn');
-    const convertBtn   = document.getElementById('convert-btn');
-    const statusBox    = document.getElementById('status-box');
-    const statusLabel  = document.getElementById('status-label-text');
-    const statusMsg    = document.getElementById('status-msg');
-    const progressWrap = document.getElementById('progress-bar-wrap');
-    const spinner      = document.getElementById('spinner');
-    const downloadBtn  = document.getElementById('download-btn');
+    let selectedFile = null, downloadURL = null;
 
-    let selectedFile = null;
-    let downloadURL  = null;
-
-    function formatBytes(bytes) {
-      if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
-      return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+    function formatBytes(b) {
+      return b < 1048576 ? (b/1024).toFixed(1)+' KB' : (b/1048576).toFixed(1)+' MB';
     }
 
     function setFile(file) {
-      if (!file) return;
-      const allowed = ['.mp4', '.mov', '.mkv'];
-      const ext = '.' + file.name.split('.').pop().toLowerCase();
-      if (!allowed.includes(ext)) {
-        showError('Invalid file type. Accepted: MP4, MOV, MKV.');
-        return;
-      }
-      if (file.size > 100 * 1024 * 1024) {
-        showError('File too large. Maximum size is 100 MB.');
-        return;
-      }
+      const ext = '.'+file.name.split('.').pop().toLowerCase();
+      if (!['.mp4','.mov','.mkv'].includes(ext)) { showStatus('error','Invalid file type. Accepted: MP4, MOV, MKV.'); return; }
+      if (file.size > 100*1024*1024) { showStatus('error','File too large. Max 100 MB.'); return; }
       selectedFile = file;
       fileName.textContent = file.name;
       fileSize.textContent = formatBytes(file.size);
       fileInfo.classList.add('visible');
       convertBtn.disabled = false;
-      resetStatus();
+      hideStatus();
       downloadBtn.classList.remove('visible');
     }
 
     function clearFile() {
-      selectedFile = null;
-      fileInput.value = '';
+      selectedFile = null; fileInput.value = '';
       fileInfo.classList.remove('visible');
       convertBtn.disabled = true;
-      resetStatus();
-      downloadBtn.classList.remove('visible');
+      hideStatus(); downloadBtn.classList.remove('visible');
       if (downloadURL) { URL.revokeObjectURL(downloadURL); downloadURL = null; }
     }
 
-    function resetStatus() {
-      statusBox.classList.remove('visible', 'error', 'success');
-      progressWrap.classList.remove('visible');
-      spinner.style.display = 'block';
+    function hideStatus() {
+      statusBox.className = ''; progressWrap.classList.remove('visible');
     }
 
-    function showProcessing(msg) {
-      statusBox.className = 'visible';
-      statusLabel.className = 'status-label processing';
-      statusLabel.textContent = 'Processing';
-      spinner.style.display = 'block';
+    function showStatus(type, msg) {
+      statusBox.className = 'visible ' + type;
+      statusLabel.className = 'status-label ' + type;
+      statusLabel.textContent = type === 'processing' ? 'Processing' : type === 'error' ? 'Error' : 'Done';
+      spinner.style.display = type === 'processing' ? 'block' : 'none';
       statusMsg.textContent = msg;
-      progressWrap.classList.add('visible');
+      type === 'processing' ? progressWrap.classList.add('visible') : progressWrap.classList.remove('visible');
     }
 
-    function showError(msg) {
-      statusBox.className = 'visible error';
-      statusLabel.className = 'status-label error';
-      statusLabel.textContent = 'Error';
-      spinner.style.display = 'none';
-      statusMsg.textContent = msg;
-      progressWrap.classList.remove('visible');
-    }
-
-    function showSuccess(msg) {
-      statusBox.className = 'visible success';
-      statusLabel.className = 'status-label success';
-      statusLabel.textContent = 'Done';
-      spinner.style.display = 'none';
-      statusMsg.textContent = msg;
-      progressWrap.classList.remove('visible');
-    }
-
-    // Drag & drop
     dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('dragover'); });
     dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
-    dropZone.addEventListener('drop', e => {
-      e.preventDefault();
-      dropZone.classList.remove('dragover');
-      const file = e.dataTransfer.files[0];
-      if (file) setFile(file);
-    });
+    dropZone.addEventListener('drop', e => { e.preventDefault(); dropZone.classList.remove('dragover'); if (e.dataTransfer.files[0]) setFile(e.dataTransfer.files[0]); });
     dropZone.addEventListener('click', () => fileInput.click());
     fileInput.addEventListener('change', () => { if (fileInput.files[0]) setFile(fileInput.files[0]); });
-
     browseBtn.addEventListener('click', () => fileInput.click());
     clearBtn.addEventListener('click', clearFile);
 
-    // Convert
     convertBtn.addEventListener('click', async () => {
       if (!selectedFile) return;
-
-      convertBtn.disabled = true;
-      browseBtn.disabled = true;
+      convertBtn.disabled = true; browseBtn.disabled = true;
       downloadBtn.classList.remove('visible');
-      showProcessing('Uploading and converting via FFmpeg...');
-
-      const formData = new FormData();
-      formData.append('video', selectedFile);
-
+      showStatus('processing', 'Converting via FFmpeg...');
+      const fd = new FormData();
+      fd.append('video', selectedFile);
       try {
-        const response = await fetch(`${API}/upload`, {
-          method: 'POST',
-          body: formData
-        });
-
-        if (!response.ok) {
-          let errMsg = 'Conversion failed.';
-          try {
-            const json = await response.json();
-            errMsg = json.error || errMsg;
-            if (json.details) errMsg += '\n\nFFmpeg output:\n' + json.details;
-          } catch (_) {}
-          showError(errMsg);
-          convertBtn.disabled = false;
-          browseBtn.disabled = false;
-          return;
+        const res = await fetch(`${API}/upload`, { method: 'POST', body: fd });
+        if (!res.ok) {
+          let msg = 'Conversion failed.';
+          try { const j = await res.json(); msg = j.error || msg; if (j.details) msg += '\n\n' + j.details; } catch(_) {}
+          showStatus('error', msg); return;
         }
-
-        const blob = await response.blob();
+        const blob = await res.blob();
         if (downloadURL) URL.revokeObjectURL(downloadURL);
         downloadURL = URL.createObjectURL(blob);
-
         downloadBtn.classList.add('visible');
-        downloadBtn.onclick = () => {
-          const a = document.createElement('a');
-          a.href = downloadURL;
-          a.download = 'square_output.mp4';
-          a.click();
-        };
-
-        showSuccess('Conversion complete. Your 1080×1080 video is ready.');
-      } catch (err) {
-        showError('Could not reach the backend. Is the server running on port 3001?');
+        downloadBtn.onclick = () => { const a = document.createElement('a'); a.href = downloadURL; a.download = 'square_output.mp4'; a.click(); };
+        showStatus('success', 'Your 1080×1080 video is ready.');
+      } catch(e) {
+        showStatus('error', 'Cannot reach backend. Is the server running?');
       } finally {
-        convertBtn.disabled = false;
-        browseBtn.disabled = false;
+        convertBtn.disabled = false; browseBtn.disabled = false;
       }
     });
   </script>
